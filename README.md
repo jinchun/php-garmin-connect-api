@@ -3,6 +3,7 @@
 - [Description](#description)
 - [Installtion](#installtion)
 - [Version Support](#version-support)
+- [HTTP Client Configuration](#http-client-configuration)
 - [Example](#example)
 - [Usage](#usage)
   - [Get authorization link](#get-authorization-link)
@@ -73,6 +74,111 @@ echo "Auth URL: " . $api->getAuthUrl();
 
 ### Backward Compatibility
 Existing code will continue to work without any changes, as the international version is used by default.
+
+# HTTP Client Configuration
+
+This library supports custom HTTP client configuration to handle various network scenarios, including proxy settings, timeouts, SSL verification, and custom headers.
+
+## Configuration Options
+
+You can configure the HTTP client using any of the following Guzzle HTTP client options:
+
+- `timeout` - Request timeout in seconds (default: 30)
+- `connect_timeout` - Connection timeout in seconds (default: 10)
+- `proxy` - Proxy server configuration
+- `verify` - SSL certificate verification (default: true)
+- `headers` - Default headers to apply to all requests
+- `allow_redirects` - Controls redirect behavior
+- `cookies` - Cookie jar configuration
+- `debug` - Enable debug output
+
+## Usage Examples
+
+### 1. Configure via constructor
+
+```php
+use Stoufa\GarminApi\GarminApi;
+
+$config = [
+    'identifier' => getenv('GARMIN_KEY'),
+    'secret' => getenv('GARMIN_SECRET'),
+    'callback_uri' => getenv('GARMIN_CALLBACK_URI')
+];
+
+$httpConfig = [
+    'timeout' => 60,
+    'connect_timeout' => 15,
+    'proxy' => 'http://proxy.example.com:8080',
+    'verify' => false,
+    'headers' => [
+        'User-Agent' => 'My Custom App/1.0'
+    ]
+];
+
+$server = new GarminApi($config, GarminApi::VERSION_INTERNATIONAL, $httpConfig);
+```
+
+### 2. Configure using setter method
+
+```php
+$server = new GarminApi($config);
+$server->setHttpClientConfig([
+    'timeout' => 45,
+    'proxy' => 'http://proxy.example.com:8080',
+    'headers' => [
+        'User-Agent' => 'My Custom App/1.0'
+    ]
+]);
+```
+
+### 3. Get current configuration
+
+```php
+$currentConfig = $server->getHttpClientConfig();
+print_r($currentConfig);
+```
+
+### 4. Common use cases
+
+#### Set custom timeout for slow networks
+```php
+$server->setHttpClientConfig([
+    'timeout' => 120,
+    'connect_timeout' => 30
+]);
+```
+
+#### Configure proxy server
+```php
+$server->setHttpClientConfig([
+    'proxy' => 'http://username:password@proxy.example.com:8080'
+]);
+```
+
+#### Disable SSL verification (for development)
+```php
+$server->setHttpClientConfig([
+    'verify' => false
+]);
+```
+
+#### Set custom User-Agent
+```php
+$server->setHttpClientConfig([
+    'headers' => [
+        'User-Agent' => 'MyApp/1.0 (contact@example.com)'
+    ]
+]);
+```
+
+#### Enable debug mode
+```php
+$server->setHttpClientConfig([
+    'debug' => true
+]);
+```
+
+All HTTP requests made by the library (OAuth authentication, API calls, etc.) will use the custom configuration.
 
 # Installtion
 ```
