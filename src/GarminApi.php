@@ -16,14 +16,143 @@ use League\OAuth1\Client\Server\User;
 class GarminApi extends Server
 {
     /**
+     * Version constants
+     */
+    const VERSION_INTERNATIONAL = 'international';
+    const VERSION_CHINESE = 'chinese';
+
+    /**
+     * API endpoints for international version
+     */
+    const INTERNATIONAL_API_URL = "https://connectapi.garmin.com/";
+    const INTERNATIONAL_USER_API_URL = "https://healthapi.garmin.com/wellness-api/rest/";
+    const INTERNATIONAL_AUTH_URL = "http://connect.garmin.com/oauthConfirm";
+
+    /**
+     * API endpoints for Chinese version
+     */
+    const CHINESE_API_URL = "https://connectapi.garmin.cn/";
+    const CHINESE_USER_API_URL = "https://healthapi.garmin.cn/wellness-api/rest/";
+    const CHINESE_AUTH_URL = "http://connect.garmin.cn/oauthConfirm";
+
+    /**
+     * Current version
+     * @var string
+     */
+    protected $version;
+
+    /**
      * Api connect endpoint
      */
-    const API_URL = "https://connectapi.garmin.com/";
+    protected $apiUrl;
 
     /**
      * Rest api endpoint
      */
-    const USER_API_URL = "https://healthapi.garmin.com/wellness-api/rest/";
+    protected $userApiUrl;
+
+    /**
+     * Authorization URL
+     */
+    protected $authUrl;
+
+    /**
+     * Constructor to initialize Garmin API with version support
+     *
+     * @param array $credentials
+     * @param string $version
+     */
+    public function __construct(array $credentials, $version = self::VERSION_INTERNATIONAL)
+    {
+        parent::__construct($credentials);
+        $this->setVersion($version);
+    }
+
+    /**
+     * Set the Garmin Connect version
+     *
+     * @param string $version
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    public function setVersion($version)
+    {
+        if (!in_array($version, [self::VERSION_INTERNATIONAL, self::VERSION_CHINESE])) {
+            throw new InvalidArgumentException("Invalid version. Must be 'international' or 'chinese'");
+        }
+
+        $this->version = $version;
+
+        if ($version === self::VERSION_CHINESE) {
+            $this->apiUrl = self::CHINESE_API_URL;
+            $this->userApiUrl = self::CHINESE_USER_API_URL;
+            $this->authUrl = self::CHINESE_AUTH_URL;
+        } else {
+            $this->apiUrl = self::INTERNATIONAL_API_URL;
+            $this->userApiUrl = self::INTERNATIONAL_USER_API_URL;
+            $this->authUrl = self::INTERNATIONAL_AUTH_URL;
+        }
+    }
+
+    /**
+     * Get the current version
+     *
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the current API URL
+     *
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return $this->apiUrl;
+    }
+
+    /**
+     * Get the current user API URL
+     *
+     * @return string
+     */
+    public function getUserApiUrl()
+    {
+        return $this->userApiUrl;
+    }
+
+    /**
+     * Get the current auth URL
+     *
+     * @return string
+     */
+    public function getAuthUrl()
+    {
+        return $this->authUrl;
+    }
+
+    /**
+     * Switch to Chinese version
+     *
+     * @return void
+     */
+    public function useChineseVersion()
+    {
+        $this->setVersion(self::VERSION_CHINESE);
+    }
+
+    /**
+     * Switch to international version
+     *
+     * @return void
+     */
+    public function useInternationalVersion()
+    {
+        $this->setVersion(self::VERSION_INTERNATIONAL);
+    }
 
     /**
      * Get the URL for retrieving temporary credentials.
@@ -32,7 +161,7 @@ class GarminApi extends Server
      */
     public function urlTemporaryCredentials()
     {
-        return self::API_URL . 'oauth-service/oauth/request_token';
+        return $this->apiUrl . 'oauth-service/oauth/request_token';
     }
 
     /**
@@ -42,7 +171,7 @@ class GarminApi extends Server
      */
     public function urlAuthorization()
     {
-        return 'http://connect.garmin.com/oauthConfirm';
+        return $this->authUrl;
     }
 
     /**
@@ -52,7 +181,7 @@ class GarminApi extends Server
      */
     public function urlTokenCredentials()
     {
-        return self::API_URL . 'oauth-service/oauth/access_token';
+        return $this->apiUrl . 'oauth-service/oauth/access_token';
     }
 
     /**
@@ -183,10 +312,10 @@ class GarminApi extends Server
         $client = $this->createHttpClient();
         $query = http_build_query($params);
         $query = 'activities?'.$query;
-        $headers = $this->getHeaders($tokenCredentials, 'GET', self::USER_API_URL . $query);
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
 
         try {
-            $response = $client->get(self::USER_API_URL . $query, [
+            $response = $client->get($this->userApiUrl . $query, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -217,10 +346,10 @@ class GarminApi extends Server
         $client = $this->createHttpClient();
         $query = http_build_query($params);
         $query = 'dailies?'.$query;
-        $headers = $this->getHeaders($tokenCredentials, 'GET', self::USER_API_URL . $query);
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
 
         try {
-            $response = $client->get(self::USER_API_URL . $query, [
+            $response = $client->get($this->userApiUrl . $query, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -247,10 +376,10 @@ class GarminApi extends Server
         $client = $this->createHttpClient();
         $query = http_build_query($params);
         $query = 'manuallyUpdatedActivities?'.$query;
-        $headers = $this->getHeaders($tokenCredentials, 'GET', self::USER_API_URL . $query);
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
 
         try {
-            $response = $client->get(self::USER_API_URL . $query, [
+            $response = $client->get($this->userApiUrl . $query, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -277,10 +406,10 @@ class GarminApi extends Server
         $client = $this->createHttpClient();
         $query = http_build_query($params);
         $query = 'activityDetails?'.$query;
-        $headers = $this->getHeaders($tokenCredentials, 'GET', self::USER_API_URL . $query);
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
 
         try {
-            $response = $client->get(self::USER_API_URL . $query, [
+            $response = $client->get($this->userApiUrl . $query, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -308,10 +437,10 @@ class GarminApi extends Server
         $client = $this->createHttpClient();
         $query = http_build_query($params);
         $query = 'backfill/'.$uri.'?'.$query;
-        $headers = $this->getHeaders($tokenCredentials, 'GET', self::USER_API_URL . $query);
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
 
         try {
-            $response = $client->get(self::USER_API_URL . $query, [
+            $response = $client->get($this->userApiUrl . $query, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -468,10 +597,10 @@ class GarminApi extends Server
     {
         $uri = 'user/registration';
         $client = $this->createHttpClient();
-        $headers = $this->getHeaders($tokenCredentials, 'DELETE', self::USER_API_URL . $uri);
+        $headers = $this->getHeaders($tokenCredentials, 'DELETE', $this->userApiUrl . $uri);
 
         try {
-            $response = $client->delete(self::USER_API_URL . $uri, [
+            $response = $client->delete($this->userApiUrl . $uri, [
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
@@ -492,7 +621,7 @@ class GarminApi extends Server
      */
     public function urlUserDetails()
     {
-        return self::USER_API_URL . 'user/id';
+        return $this->userApiUrl . 'user/id';
     }
 
     /**

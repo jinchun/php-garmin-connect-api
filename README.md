@@ -2,6 +2,7 @@
 - [Table of contents](#table-of-contents)
 - [Description](#description)
 - [Installtion](#installtion)
+- [Version Support](#version-support)
 - [Example](#example)
 - [Usage](#usage)
   - [Get authorization link](#get-authorization-link)
@@ -16,13 +17,70 @@
 # Description
 PHP library to connect and use garmin wellness api
 
+# Version Support
+This library now supports both **Chinese** and **International** versions of Garmin Connect API:
+
+- **International Version** (default): Uses `connectapi.garmin.com` and `healthapi.garmin.com`
+- **Chinese Version**: Uses `connectapi.garmin.cn` and `healthapi.garmin.cn`
+
+## Version Usage Examples
+
+### Creating API instances for different versions
+```php
+use Stoufa\GarminApi\GarminApi;
+
+$config = [
+    'identifier' => getenv('GARMIN_KEY'),
+    'secret' => getenv('GARMIN_SECRET'),
+    'callback_uri' => getenv('GARMIN_CALLBACK_URI')
+];
+
+// International version (default)
+$internationalApi = new GarminApi($config, GarminApi::VERSION_INTERNATIONAL);
+
+// Chinese version
+$chineseApi = new GarminApi($config, GarminApi::VERSION_CHINESE);
+```
+
+### Dynamic version switching
+```php
+$api = new GarminApi($config);
+
+// Switch to Chinese version
+$api->useChineseVersion();
+
+// Switch to International version
+$api->useInternationalVersion();
+
+// Get current configuration
+echo "Current version: " . $api->getVersion();
+echo "API URL: " . $api->getApiUrl();
+echo "User API URL: " . $api->getUserApiUrl();
+echo "Auth URL: " . $api->getAuthUrl();
+```
+
+### Version-specific endpoints
+- **Chinese Version**:
+  - API URL: `https://connectapi.garmin.cn/`
+  - User API URL: `https://healthapi.garmin.cn/wellness-api/rest/`
+  - Auth URL: `http://connect.garmin.cn/oauthConfirm`
+
+- **International Version**:
+  - API URL: `https://connectapi.garmin.com/`
+  - User API URL: `https://healthapi.garmin.com/wellness-api/rest/`
+  - Auth URL: `http://connect.garmin.com/oauthConfirm`
+
+### Backward Compatibility
+Existing code will continue to work without any changes, as the international version is used by default.
+
 # Installtion
 ```
 composer require stoufa06/php-garmin-connect-api
 ```
 # Example
 
-Please take a look at [examples](./examples/README.md) folder
+Please take a look at [examples](./examples/README.md) folder for complete usage examples, including [version switching examples](./examples/version_switching_example.php).
+
 # Usage 
 ## Get authorization link
 ```php
