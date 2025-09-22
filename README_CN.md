@@ -293,6 +293,9 @@ $server->getManuallyActivitySummary($tokenCredentials, $params);
 
 // 活动详情摘要
 $server->getActivityDetailsSummary($tokenCredentials, $params);
+
+// 用户指标（包括 VO2 max 和 fitness age）
+$server->getUserMetrics($tokenCredentials, $params);
 ```
 
 ### 回填活动数据
@@ -338,3 +341,31 @@ $server->backfillPulseOxSummary($tokenCredentials, $params);
 // 回填呼吸摘要
 $server->backfillRespirationSummary($tokenCredentials, $params);
 ```
+
+### 获取用户指标（VO2 Max）
+
+`getUserMetrics` 方法用于检索用户健身指标，包括 VO2 max 和 fitness age。此方法需要同时传递 `uploadStartTimeInSeconds` 和 `uploadEndTimeInSeconds` 参数，最大时间窗口为 24 小时。
+
+```php
+// 获取特定 24 小时期间的用户指标
+$params = [
+    'uploadStartTimeInSeconds' => 1726876800, // Unix 时间戳
+    'uploadEndTimeInSeconds' => 1726963200    // Unix 时间戳（最多 24 小时后）
+];
+
+$userMetrics = $server->getUserMetrics($tokenCredentials, $params);
+
+// 响应将包含 VO2 max 数据和其他健身指标
+// 响应结构示例：
+// {
+//   "userMetrics": [
+//     {
+//       "vo2Max": 45.2,
+//       "fitnessAge": 28,
+//       "timestamp": "2023-09-21T12:00:00Z"
+//     }
+//   ]
+// }
+```
+
+**重要提示**：用户指标查询的时间窗口不能超过 24 小时。

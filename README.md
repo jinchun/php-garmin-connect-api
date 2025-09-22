@@ -288,6 +288,9 @@ $server->getManuallyActivitySummary($tokenCredentials, $params);
 
 // Activity details summaries
 $server->getActivityDetailsSummary($tokenCredentials, $params);
+
+// User metrics (including VO2 max and fitness age)
+$server->getUserMetrics($tokenCredentials, $params);
 ```
 
 
@@ -334,3 +337,31 @@ $server->backfillPulseOxSummary($tokenCredentials, $params);
 // Backfill respiration summaries
 $server->backfillRespirationSummary($tokenCredentials, $params);
 ```
+
+### Get User Metrics (VO2 Max)
+
+The `getUserMetrics` method retrieves user fitness metrics including VO2 max and fitness age. This method requires both `uploadStartTimeInSeconds` and `uploadEndTimeInSeconds` parameters with a maximum 24-hour window.
+
+```php
+// Get user metrics for a specific 24-hour period
+$params = [
+    'uploadStartTimeInSeconds' => 1726876800, // Unix timestamp
+    'uploadEndTimeInSeconds' => 1726963200    // Unix timestamp (max 24 hours later)
+];
+
+$userMetrics = $server->getUserMetrics($tokenCredentials, $params);
+
+// The response will include VO2 max data and other fitness metrics
+// Example response structure:
+// {
+//   "userMetrics": [
+//     {
+//       "vo2Max": 45.2,
+//       "fitnessAge": 28,
+//       "timestamp": "2023-09-21T12:00:00Z"
+//     }
+//   ]
+// }
+```
+
+**Important**: The time window for user metrics queries cannot exceed 24 hours.

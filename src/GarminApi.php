@@ -430,6 +430,36 @@ class GarminApi extends Server
         }
         return $response->getBody()->getContents();
     }
+
+    /**
+     * get user metrics including VO2 max and fitness age
+     *
+     * @param TokenCredentials $tokenCredentials
+     * @param array $params Must include uploadStartTimeInSeconds and uploadEndTimeInSeconds (max 24 hours window)
+     * @return string json response
+     * @throws Exception
+     */
+    public function getUserMetrics(TokenCredentials $tokenCredentials, array $params)
+    {
+        $client = $this->createHttpClient();
+        $query = http_build_query($params);
+        $query = 'userMetrics?'.$query;
+        $headers = $this->getHeaders($tokenCredentials, 'GET', $this->userApiUrl . $query);
+
+        try {
+            $response = $client->get($this->userApiUrl . $query, [
+                'headers' => $headers,
+            ]);
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
+            $body = $response->getBody();
+            $statusCode = $response->getStatusCode();
+            throw new \Exception(
+                "Received error [$body] with status code [$statusCode] when retrieving user metrics."
+            );
+        }
+        return $response->getBody()->getContents();
+    }
     
     /**
      * send request to back fill summary type
