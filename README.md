@@ -21,7 +21,7 @@ PHP library to connect and use garmin wellness api
 This library now supports both **Chinese** and **International** versions of Garmin Connect API:
 
 - **International Version** (default): Uses `connectapi.garmin.com` and `healthapi.garmin.com`
-- **Chinese Version**: Uses `connectapi.garmin.cn` and `healthapi.garmin.cn`
+- **Chinese Version**: Uses `connectapi.garmin.cn` (OAuth) and `gcs-wellness.garmin.cn` (Health REST API)
 
 ## Version Usage Examples
 
@@ -61,9 +61,10 @@ echo "Auth URL: " . $api->getAuthUrl();
 
 ### Version-specific endpoints
 - **Chinese Version**:
-  - API URL: `https://connectapi.garmin.cn/`
-  - User API URL: `https://healthapi.garmin.cn/wellness-api/rest/`
+  - OAuth API URL: `https://connectapi.garmin.cn/` (for request/access token)
+  - Health REST API URL: `https://gcs-wellness.garmin.cn/wellness-api/rest/` (for activities and user data)
   - Auth URL: `http://connect.garmin.cn/oauthConfirm`
+  - Tools URL: `https://healthtools.garmin.cn/tools/login` (Data Viewer / Backfill / Ping)
 
 - **International Version**:
   - API URL: `https://connectapi.garmin.com/`

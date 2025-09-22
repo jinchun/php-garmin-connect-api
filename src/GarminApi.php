@@ -32,7 +32,7 @@ class GarminApi extends Server
      * API endpoints for Chinese version
      */
     const CHINESE_API_URL = "https://connectapi.garmin.cn/";
-    const CHINESE_USER_API_URL = "https://healthapi.garmin.cn/wellness-api/rest/";
+    const CHINESE_USER_API_URL = "https://gcs-wellness.garmin.cn/wellness-api/rest/";
     const CHINESE_AUTH_URL = "http://connect.garmin.cn/oauthConfirm";
 
     /**
