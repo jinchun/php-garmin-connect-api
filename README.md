@@ -75,7 +75,7 @@ Existing code will continue to work without any changes, as the international ve
 
 # Installtion
 ```
-composer require stoufa06/php-garmin-connect-api
+composer require jinchun/php-garmin-connect-api
 ```
 # Example
 
