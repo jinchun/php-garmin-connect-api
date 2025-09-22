@@ -57,15 +57,23 @@ class GarminApi extends Server
     protected $authUrl;
 
     /**
+     * HTTP client configuration
+     * @var array
+     */
+    protected $httpClientConfig = [];
+
+    /**
      * Constructor to initialize Garmin API with version support
      *
      * @param array $credentials
      * @param string $version
+     * @param array $httpConfig
      */
-    public function __construct(array $credentials, $version = self::VERSION_INTERNATIONAL)
+    public function __construct(array $credentials, $version = self::VERSION_INTERNATIONAL, array $httpConfig = [])
     {
         parent::__construct($credentials);
         $this->setVersion($version);
+        $this->httpClientConfig = $httpConfig;
     }
 
     /**
@@ -677,5 +685,43 @@ class GarminApi extends Server
     public function userScreenName($data, TokenCredentials $tokenCredentials)
     {
         return '';
+    }
+
+    /**
+     * Set HTTP client configuration
+     *
+     * @param array $config
+     * @return void
+     */
+    public function setHttpClientConfig(array $config)
+    {
+        $this->httpClientConfig = $config;
+    }
+
+    /**
+     * Get HTTP client configuration
+     *
+     * @return array
+     */
+    public function getHttpClientConfig()
+    {
+        return $this->httpClientConfig;
+    }
+
+    /**
+     * Create HTTP client with custom configuration
+     *
+     * @return \GuzzleHttp\Client
+     */
+    public function createHttpClient()
+    {
+        $defaultConfig = [
+            'timeout' => 30,
+            'connect_timeout' => 10,
+        ];
+
+        $config = array_merge($defaultConfig, $this->httpClientConfig);
+
+        return new \GuzzleHttp\Client($config);
     }
 }
