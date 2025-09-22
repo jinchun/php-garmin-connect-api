@@ -1,5 +1,5 @@
 {
-    "name": "stoufa06/php-garmin-connect-api",
+    "name": "jinchun/php-garmin-connect-api",
     "description": "PHP library to connect and use garmin wellness api",
     "type": "library",
     "require": {
@@ -9,7 +9,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Mustapha.A"
+            "name": "Mustapha.A,Jinchun"
         }
     ],
     "autoload": {
